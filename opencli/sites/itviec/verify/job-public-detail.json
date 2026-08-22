@@ -1,0 +1,52 @@
+{
+  "args": [
+    "https://itviec.com/it-jobs/fresher-junior-senior-ai-agent-engineer-grit-logic-reap-ai-0022"
+  ],
+  "expect": {
+    "rowCount": {
+      "min": 1,
+      "max": 1
+    },
+    "columns": [
+      "job_id",
+      "availability",
+      "accepting_applications",
+      "status_reason",
+      "title",
+      "company",
+      "location",
+      "listed",
+      "applicants",
+      "criteria",
+      "links",
+      "description"
+    ],
+    "types": {
+      "job_id": "string",
+      "availability": "string",
+      "accepting_applications": "boolean",
+      "status_reason": "string",
+      "title": "string",
+      "company": "string",
+      "location": "string",
+      "listed": "string",
+      "applicants": "string",
+      "criteria": "object",
+      "links": "object",
+      "description": "string"
+    },
+    "patterns": {
+      "job_id": "^[a-z0-9-]+-\\d{4}$",
+      "availability": "^(accepting|closed|unknown|unavailable)$",
+      "status_reason": "^[a-z0-9_]+$"
+    },
+    "notEmpty": [
+      "job_id",
+      "availability",
+      "status_reason",
+      "title",
+      "company",
+      "description"
+    ]
+  }
+}

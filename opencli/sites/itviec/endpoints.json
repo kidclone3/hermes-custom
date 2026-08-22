@@ -1,0 +1,13 @@
+{
+  "jobPostingPage": {
+    "url": "https://itviec.com/it-jobs/{job_slug}",
+    "method": "GET",
+    "params": {
+      "required": ["job_slug"],
+      "optional": []
+    },
+    "response": "Public ITviec HTML containing schema.org JobPosting JSON-LD; expired listings return HTTP 410",
+    "verified_at": "2026-08-22",
+    "notes": "links.itviec.com tracking URLs redirect to the canonical listing. Verify the final host/path and the BreadcrumbList path before accepting active JobPosting data."
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "hermes-custom",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Versioned Hermes and OpenCLI customizations for local automation.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "bash tools/verify.sh",
+    "verify:live": "bash tools/verify.sh --live"
+  },
+  "dependencies": {
+    "cheerio": "1.2.0",
+    "playwright-extra": "4.3.6",
+    "puppeteer-extra-plugin-stealth": "2.11.2"
+  }
+}
