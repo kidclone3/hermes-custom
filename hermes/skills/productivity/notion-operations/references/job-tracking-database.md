@@ -86,6 +86,12 @@ curl -s -X POST "https://api.notion.com/v1/pages" \
 - **Identity safety:** Never trust the logged-in `/jobs/search/?currentJobId=<id>` route without verifying the embedded job ID; expired IDs can silently fall back to unrelated search results.
 - **Closed state:** LinkedIn can return HTTP 200 for closed jobs. Use the explicit `No longer accepting applications` signal. Map `Saved`/`To Apply` to Notion `No Accept Apply`, but preserve application-pipeline statuses such as `Applied` and `Interviewing`.
 
+### LinkedIn Description Formatting
+
+- Preserve the paragraph separators returned by the LinkedIn adapter. Do **not** pass a full job description through a whitespace normalizer such as `re.sub(r"\s+", " ", text)`; that collapses headings, paragraphs, and list-like lines into one unreadable Notion paragraph.
+- Notion's Markdown read endpoint may serialize separate paragraph blocks with single newlines. For formatting verification, query `/v1/blocks/{page_id}/children` and count paragraph blocks after the `Job Description` heading instead of relying on `\n\n` in serialized Markdown.
+- During idempotent backfills, an existing `LinkedIn Job Details` heading is not proof that the body has good structure. Track formatter version or inspect block structure before skipping an old page.
+
 ### ITviec Job Robot
 
 - **Sender:** `itviec+jobrobot@itviec.com` (daily matches), `itviec+ijm@itviec.com` (recruiter emails)

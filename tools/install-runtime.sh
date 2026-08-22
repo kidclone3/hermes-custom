@@ -2,7 +2,9 @@
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-hermes_home="${HERMES_HOME:-$HOME/.hermes}"
+# This repository owns default-profile customizations. Do not inherit a
+# session's HERMES_HOME, which may point at another profile.
+hermes_home="${HERMES_CUSTOM_HERMES_HOME:-$HOME/.hermes}"
 opencli_home="${OPENCLI_HOME:-$HOME/.opencli}"
 timestamp="$(date +%Y%m%d-%H%M%S)"
 backup_root="$hermes_home/backups/hermes-custom/$timestamp"
@@ -51,6 +53,16 @@ link_file "$repo_root/hermes/scripts/job-scan-status.sh" \
   "$hermes_home/scripts/job-scan-status.sh"
 link_file "$repo_root/hermes/scripts/job-crawler.mjs" \
   "$hermes_home/scripts/job-crawler.mjs"
+for utility in \
+  repair_flat_linkedin_notion.py \
+  query_linkedin_jobs.py \
+  collect_linkedin_job_details.py \
+  enrich_linkedin_jobs.py \
+  export_linkedin_jobs_to_obsidian.py \
+  enrich_itviec_jobs.py; do
+  link_file "$repo_root/hermes/scripts/backfill/$utility" \
+    "$hermes_home/cache/$utility"
+done
 link_file "$repo_root/hermes/skills/productivity/job-tracker/SKILL.md" \
   "$hermes_home/skills/productivity/job-tracker/SKILL.md"
 link_file "$repo_root/hermes/skills/productivity/notion-operations/references/job-tracking-database.md" \

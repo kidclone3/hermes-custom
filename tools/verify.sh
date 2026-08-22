@@ -20,7 +20,13 @@ done
 
 uv run python3 -m py_compile \
   "$repo_root/hermes/scripts/job-scan.py" \
-  "$repo_root/hermes/scripts/test_job_scan.py"
+  "$repo_root/hermes/scripts/test_job_scan.py" \
+  "$repo_root/hermes/scripts/backfill/repair_flat_linkedin_notion.py" \
+  "$repo_root/hermes/scripts/backfill/query_linkedin_jobs.py" \
+  "$repo_root/hermes/scripts/backfill/collect_linkedin_job_details.py" \
+  "$repo_root/hermes/scripts/backfill/enrich_linkedin_jobs.py" \
+  "$repo_root/hermes/scripts/backfill/export_linkedin_jobs_to_obsidian.py" \
+  "$repo_root/hermes/scripts/backfill/enrich_itviec_jobs.py"
 uv run python3 -m unittest "$repo_root/hermes/scripts/test_job_scan.py"
 node --check "$repo_root/hermes/scripts/job-crawler.mjs"
 node --check "$repo_root/opencli/clis/itviec/job-public-detail.js"

@@ -9,6 +9,7 @@ Versioned source for local Hermes and OpenCLI customizations. Runtime state, cre
 - Obsidian job-note and index generation
 - Cron status wrapper
 - Regression tests
+- Versioned LinkedIn/ITviec backfill and repair utilities formerly stored in the runtime cache
 - The job-tracker skill and its Notion job-tracking reference
 - Legacy Playwright crawler retained as a diagnostic fallback
 
@@ -17,6 +18,7 @@ Versioned source for local Hermes and OpenCLI customizations. Runtime state, cre
 ```text
 hermes/
   scripts/                         Runtime scanner, tests, cron wrapper, crawler
+    backfill/                      Versioned operational backfill/repair sources
   skills/productivity/             Custom skill files used by Hermes
 opencli/
   clis/itviec/                     ITviec adapter
@@ -46,6 +48,8 @@ bash tools/install-runtime.sh
 ```
 
 The installer creates symlinks from the active Hermes/OpenCLI paths to this repository. If a destination differs from the repository file, it is backed up under `~/.hermes/backups/hermes-custom/<timestamp>/` before replacement.
+
+The default target is `~/.hermes`, even when the current shell has a profile-specific `HERMES_HOME`. A different target must be explicit via `HERMES_CUSTOM_HERMES_HOME=/absolute/path`; this prevents accidental writes into another Hermes profile.
 
 The existing Hermes cron job continues to invoke:
 
@@ -87,3 +91,5 @@ opencli itviec job-public-detail \
 - Notion backfill result files
 - Obsidian job notes and indexes
 - OpenCLI response traces and generated fixtures
+
+The six legacy backfill utility entrypoints under `~/.hermes/cache/*.py` are symlinks to repository sources. Their generated JSON, JSONL, logs, backups, and payload caches remain unversioned runtime data.
