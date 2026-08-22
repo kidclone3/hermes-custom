@@ -12,6 +12,7 @@
     "verify:live": "bash tools/verify.sh --live"
   },
   "dependencies": {
+    "@jackwener/opencli": "1.8.6",
     "cheerio": "1.2.0",
     "playwright-extra": "4.3.6",
     "puppeteer-extra-plugin-stealth": "2.11.2"
