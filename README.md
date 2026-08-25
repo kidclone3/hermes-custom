@@ -8,6 +8,7 @@ Versioned source for local Hermes and OpenCLI customizations. Runtime state, cre
 - ITviec public-job OpenCLI adapter
 - Obsidian job-note and index generation
 - Cron status wrapper
+- Failure-only cron watchdog with durable execution checkpoints
 - Regression tests
 - Versioned LinkedIn/ITviec backfill and repair utilities formerly stored in the runtime cache
 - The job-tracker skill and its Notion job-tracking reference
@@ -17,7 +18,7 @@ Versioned source for local Hermes and OpenCLI customizations. Runtime state, cre
 
 ```text
 hermes/
-  scripts/                         Runtime scanner, tests, cron wrapper, crawler
+  scripts/                         Runtime scanner, tests, cron wrappers/watchdog, crawler
     backfill/                      Versioned operational backfill/repair sources
   skills/productivity/             Custom skill files used by Hermes
 opencli/
@@ -47,7 +48,7 @@ npm install
 bash tools/install-runtime.sh
 ```
 
-The installer normally creates symlinks from the active Hermes/OpenCLI paths to this repository. The cron entrypoint `job-scan-status.sh` is copied instead because Hermes requires scheduled scripts to resolve inside `~/.hermes/scripts`. If a destination differs from the repository file, it is backed up under `~/.hermes/backups/hermes-custom/<timestamp>/` before replacement.
+The installer normally creates symlinks from the active Hermes/OpenCLI paths to this repository. Cron entrypoints (`job-scan-status.sh` and `cron-failure-watch.py`) are copied instead because Hermes requires scheduled scripts to resolve inside `~/.hermes/scripts`. If a destination differs from the repository file, it is backed up under `~/.hermes/backups/hermes-custom/<timestamp>/` before replacement.
 
 The default target is `~/.hermes`, even when the current shell has a profile-specific `HERMES_HOME`. A different target must be explicit via `HERMES_CUSTOM_HERMES_HOME=/absolute/path`; this prevents accidental writes into another Hermes profile.
 

@@ -20,6 +20,8 @@ done
 
 bash "$repo_root/tools/test-install-runtime.sh"
 uv run python3 -m py_compile \
+  "$repo_root/hermes/scripts/cron-failure-watch.py" \
+  "$repo_root/hermes/scripts/test_cron_failure_watch.py" \
   "$repo_root/hermes/scripts/job-scan.py" \
   "$repo_root/hermes/scripts/test_job_scan.py" \
   "$repo_root/hermes/scripts/backfill/repair_flat_linkedin_notion.py" \
@@ -29,6 +31,7 @@ uv run python3 -m py_compile \
   "$repo_root/hermes/scripts/backfill/export_linkedin_jobs_to_obsidian.py" \
   "$repo_root/hermes/scripts/backfill/enrich_itviec_jobs.py"
 uv run python3 -m unittest "$repo_root/hermes/scripts/test_job_scan.py"
+uv run python3 -m unittest "$repo_root/hermes/scripts/test_cron_failure_watch.py"
 node --check "$repo_root/hermes/scripts/job-crawler.mjs"
 node --check "$repo_root/opencli/clis/itviec/job-public-detail.js"
 opencli validate itviec/job-public-detail

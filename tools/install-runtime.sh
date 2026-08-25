@@ -86,6 +86,8 @@ link_file "$repo_root/hermes/scripts/test_job_scan.py" \
   "$hermes_home/scripts/test_job_scan.py"
 copy_file "$repo_root/hermes/scripts/job-scan-status.sh" \
   "$hermes_home/scripts/job-scan-status.sh"
+copy_file "$repo_root/hermes/scripts/cron-failure-watch.py" \
+  "$hermes_home/scripts/cron-failure-watch.py"
 link_file "$repo_root/hermes/scripts/job-crawler.mjs" \
   "$hermes_home/scripts/job-crawler.mjs"
 for utility in \
