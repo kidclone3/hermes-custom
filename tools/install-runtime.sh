@@ -10,6 +10,7 @@ timestamp="$(date +%Y%m%d-%H%M%S)"
 backup_root="$hermes_home/backups/hermes-custom/$timestamp"
 backup_count=0
 link_count=0
+copy_count=0
 
 link_file() {
   local source_path="$1"
@@ -45,11 +46,45 @@ link_file() {
   printf 'Linked: %s -> %s\n' "$destination_path" "$source_path"
 }
 
+copy_file() {
+  local source_path="$1"
+  local destination_path="$2"
+
+  if [[ ! -f "$source_path" ]]; then
+    printf 'Missing repository file: %s\n' "$source_path" >&2
+    return 1
+  fi
+
+  mkdir -p "$(dirname "$destination_path")"
+  if [[ -f "$destination_path" ]] && [[ ! -L "$destination_path" ]] && cmp -s "$source_path" "$destination_path"; then
+    printf 'Already copied: %s\n' "$destination_path"
+    return 0
+  fi
+
+  if [[ -e "$destination_path" || -L "$destination_path" ]]; then
+    if cmp -s "$source_path" "$destination_path"; then
+      rm -f "$destination_path"
+    else
+      local relative_path="${destination_path#/}"
+      local backup_path="$backup_root/$relative_path"
+      mkdir -p "$(dirname "$backup_path")"
+      cp -a "$destination_path" "$backup_path"
+      rm -f "$destination_path"
+      backup_count=$((backup_count + 1))
+      printf 'Backed up: %s -> %s\n' "$destination_path" "$backup_path"
+    fi
+  fi
+
+  cp -a "$source_path" "$destination_path"
+  copy_count=$((copy_count + 1))
+  printf 'Copied: %s <- %s\n' "$destination_path" "$source_path"
+}
+
 link_file "$repo_root/hermes/scripts/job-scan.py" \
   "$hermes_home/scripts/job-scan.py"
 link_file "$repo_root/hermes/scripts/test_job_scan.py" \
   "$hermes_home/scripts/test_job_scan.py"
-link_file "$repo_root/hermes/scripts/job-scan-status.sh" \
+copy_file "$repo_root/hermes/scripts/job-scan-status.sh" \
   "$hermes_home/scripts/job-scan-status.sh"
 link_file "$repo_root/hermes/scripts/job-crawler.mjs" \
   "$hermes_home/scripts/job-crawler.mjs"
@@ -76,7 +111,8 @@ link_file "$repo_root/opencli/sites/itviec/notes.md" \
 link_file "$repo_root/opencli/sites/itviec/verify/job-public-detail.json" \
   "$opencli_home/sites/itviec/verify/job-public-detail.json"
 
-printf '\nInstalled hermes-custom: %s link(s), %s backup(s).\n' "$link_count" "$backup_count"
+printf '\nInstalled hermes-custom: %s link(s), %s copy/copies, %s backup(s).\n' \
+  "$link_count" "$copy_count" "$backup_count"
 if (( backup_count > 0 )); then
   printf 'Backups: %s\n' "$backup_root"
 fi

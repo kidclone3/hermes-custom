@@ -47,7 +47,7 @@ npm install
 bash tools/install-runtime.sh
 ```
 
-The installer creates symlinks from the active Hermes/OpenCLI paths to this repository. If a destination differs from the repository file, it is backed up under `~/.hermes/backups/hermes-custom/<timestamp>/` before replacement.
+The installer normally creates symlinks from the active Hermes/OpenCLI paths to this repository. The cron entrypoint `job-scan-status.sh` is copied instead because Hermes requires scheduled scripts to resolve inside `~/.hermes/scripts`. If a destination differs from the repository file, it is backed up under `~/.hermes/backups/hermes-custom/<timestamp>/` before replacement.
 
 The default target is `~/.hermes`, even when the current shell has a profile-specific `HERMES_HOME`. A different target must be explicit via `HERMES_CUSTOM_HERMES_HOME=/absolute/path`; this prevents accidental writes into another Hermes profile.
 
@@ -57,7 +57,7 @@ The existing Hermes cron job continues to invoke:
 ~/.hermes/scripts/job-scan-status.sh
 ```
 
-That path becomes a symlink into this repository, so no cron configuration change is required.
+That path is installed as a regular file inside the Hermes scripts directory, so it passes cron's script-containment check. The repository remains canonical; rerun the installer after changing the wrapper. No cron configuration change is required.
 
 ## Verify
 

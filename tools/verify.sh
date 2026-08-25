@@ -18,6 +18,7 @@ for command_name in uv node opencli; do
   fi
 done
 
+bash "$repo_root/tools/test-install-runtime.sh"
 uv run python3 -m py_compile \
   "$repo_root/hermes/scripts/job-scan.py" \
   "$repo_root/hermes/scripts/test_job_scan.py" \
