@@ -12,6 +12,12 @@ backup_count=0
 link_count=0
 copy_count=0
 
+if [[ ! -d "$repo_root/node_modules/@jackwener/opencli" ]]; then
+  printf 'Missing repository dependencies: %s\nRun npm ci in %s before installing runtime links.\n' \
+    "$repo_root/node_modules/@jackwener/opencli" "$repo_root" >&2
+  exit 1
+fi
+
 link_file() {
   local source_path="$1"
   local destination_path="$2"

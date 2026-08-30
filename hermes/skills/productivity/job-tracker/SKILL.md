@@ -181,6 +181,8 @@ Before inserting, the script queries the Notion database for two identities:
 
 A match on either identity is skipped. Generic or unstructured notes (for example, `HCMC office`) are not used as an identity, because they are not safe evidence that two jobs are the same.
 
+**Critical ordering rule:** enrich/resolve a tracking URL before the final duplicate check, or compare both the pre-enrichment and post-enrichment identities. If deduplication checks the email tracking URL and raw fingerprint first, but the created page stores a canonical URL plus enriched location/salary, a retry will not match its own previous write and will create duplicate pages. Recompute the URL and Notes fingerprint after enrichment, check those canonical keys immediately before creation, and add the exact stored keys to the in-memory sets after creation. A regression test must process the same enriched email twice and assert zero creates on the second pass.
+
 This makes re-running the script (or running with `--all`) idempotent. To clean up historical structured duplicates, run:
 
 ```bash

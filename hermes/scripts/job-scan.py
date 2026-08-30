@@ -634,6 +634,35 @@ def job_fingerprint(job: dict) -> str | None:
     ))
 
 
+def duplicate_reason(
+    job: dict,
+    existing_urls: set[str],
+    existing_fingerprints: set[str],
+) -> str | None:
+    """Return the matching identity type for a job, if it already exists."""
+    url = str(job.get("url") or "").strip()
+    if url:
+        return "URL" if normalized_job_url(url) in existing_urls else None
+    fingerprint = job_fingerprint(job)
+    if fingerprint and fingerprint in existing_fingerprints:
+        return "Notes"
+    return None
+
+
+def remember_job_identity(
+    job: dict,
+    existing_urls: set[str],
+    existing_fingerprints: set[str],
+) -> None:
+    """Add the exact persisted identity keys for a real or simulated create."""
+    stored_url = str(job.get("url") or "").strip()
+    if stored_url:
+        existing_urls.add(normalized_job_url(stored_url))
+    stored_fingerprint = job_fingerprint(job)
+    if stored_fingerprint:
+        existing_fingerprints.add(stored_fingerprint)
+
+
 def notes_fingerprint(notes: str) -> str | None:
     """Extract a job fingerprint from scanner-generated Notes.
 
@@ -663,13 +692,20 @@ def rich_text_value(prop: dict) -> str:
 
 
 def duplicate_page_ids_to_archive(pages: list[dict]) -> list[str]:
-    """Return older structured duplicates, retaining the latest creation time."""
-    groups: dict[str, list[dict]] = {}
+    """Return older duplicates, preferring stable URL identity over Notes."""
+    groups: dict[tuple[str, str], list[dict]] = {}
     for page in pages:
-        notes = rich_text_value(page.get("properties", {}).get("Notes", {}))
-        fingerprint = notes_fingerprint(notes)
-        if fingerprint:
-            groups.setdefault(fingerprint, []).append(page)
+        properties = page.get("properties", {})
+        url = str(properties.get("Job URL", {}).get("url") or "").strip()
+        if url:
+            identity = ("url", normalized_job_url(url))
+        else:
+            notes = rich_text_value(properties.get("Notes", {}))
+            fingerprint = notes_fingerprint(notes)
+            if not fingerprint:
+                continue
+            identity = ("notes", fingerprint)
+        groups.setdefault(identity, []).append(page)
 
     ids = []
     for group in groups.values():
@@ -880,17 +916,40 @@ def parse_itviec_alert(body: str, eml_path: str | None = None) -> list[dict]:
                 "salary": salary,
             })
 
-    # Now try to extract URLs from the raw HTML export
+    # Match each parsed job to at most one HTML link. Reserve every exact
+    # normalized title match first, across the whole email, so an earlier
+    # truncated title cannot consume a later job's exact link. Only then use
+    # containment as a fallback for the remaining jobs and links.
     if eml_path and os.path.exists(eml_path):
-        html_urls = _extract_itviec_urls_from_eml(eml_path)
-        # Match URLs to jobs by checking if job title appears in anchor text
+        unmatched_html_jobs = _extract_itviec_urls_from_eml(eml_path)
+        unmatched_jobs = []
         for job in jobs:
             role_clean = normalized_text(job["role"])
-            for html_job in html_urls:
-                html_title_clean = normalized_text(html_job["title"])
-                if role_clean in html_title_clean or html_title_clean in role_clean:
-                    job["url"] = html_job["url"]
-                    break
+            exact_match = next((
+                html_job for html_job in unmatched_html_jobs
+                if normalized_text(html_job["title"]) == role_clean
+            ), None)
+            if exact_match is None:
+                unmatched_jobs.append(job)
+                continue
+            job["url"] = exact_match["url"]
+            unmatched_html_jobs.remove(exact_match)
+
+        for job in unmatched_jobs:
+            role_clean = normalized_text(job["role"])
+            candidates = [
+                html_job for html_job in unmatched_html_jobs
+                if role_clean in normalized_text(html_job["title"])
+                or normalized_text(html_job["title"]) in role_clean
+            ]
+            if not candidates:
+                continue
+            chosen = min(
+                candidates,
+                key=lambda html_job: abs(len(normalized_text(html_job["title"])) - len(role_clean)),
+            )
+            job["url"] = chosen["url"]
+            unmatched_html_jobs.remove(chosen)
 
     return jobs
 
@@ -1408,17 +1467,12 @@ def main():
             total_jobs += 1
             url = job.get("url", "")
 
-            # Prefer URL identity, then use structured Notes for listings without
-            # a stable URL. The latter makes repeated ITviec alerts idempotent.
-            fingerprint = job_fingerprint(job)
-            if url:
-                normalized = normalized_job_url(url)
-                if normalized in existing_urls:
-                    print(f"  ⊘ Skipped (duplicate URL): {job['company']} — {job['role']}")
-                    skipped += 1
-                    continue
-            if fingerprint and fingerprint in existing_fingerprints:
-                print(f"  ⊘ Skipped (duplicate Notes): {job['company']} — {job['role']}")
+            # Avoid external enrichment for identities already known from the
+            # email. A second check after enrichment handles canonical URLs and
+            # changed location/salary fields.
+            reason = duplicate_reason(job, existing_urls, existing_fingerprints)
+            if reason:
+                print(f"  ⊘ Skipped (duplicate {reason}): {job['company']} — {job['role']}")
                 skipped += 1
                 continue
 
@@ -1435,10 +1489,6 @@ def main():
                         f"    Collected {len(detail.get('description', ''))} chars; "
                         f"availability={detail.get('availability', 'unknown')}"
                     )
-                    if not dry_run:
-                        note_path = write_linkedin_job_markdown(job)
-                        linkedin_notes_written += 1
-                        print(f"    Wrote Obsidian note: {note_path.name}")
                 except (json.JSONDecodeError, OSError, RuntimeError, subprocess.TimeoutExpired, ValueError) as error:
                     print(f"    Failed LinkedIn collection: {str(error)[:200]}")
                     failed += 1
@@ -1455,10 +1505,6 @@ def main():
                         f"    Collected {len(detail.get('description', ''))} chars; "
                         f"availability={detail.get('availability', 'unknown')}"
                     )
-                    if not dry_run:
-                        note_path = write_itviec_job_markdown(job)
-                        itviec_notes_written += 1
-                        print(f"    Wrote Obsidian note: {note_path.name}")
                 except (json.JSONDecodeError, OSError, RuntimeError, subprocess.TimeoutExpired, ValueError) as error:
                     print(f"    Failed ITviec collection: {str(error)[:200]}")
                     failed += 1
@@ -1484,6 +1530,31 @@ def main():
                 else:
                     print(f"    ⚠ No description extracted")
 
+            # Enrichment can replace a tracking URL with the canonical listing
+            # and can change fingerprint fields. Recheck the exact values that
+            # will be persisted before writing either Notion or Obsidian.
+            reason = duplicate_reason(job, existing_urls, existing_fingerprints)
+            if reason:
+                print(f"  ⊘ Skipped after enrichment (duplicate {reason}): {job['company']} — {job['role']}")
+                skipped += 1
+                continue
+
+            if not dry_run:
+                try:
+                    if is_linkedin and job.get("linkedin_detail"):
+                        note_path = write_linkedin_job_markdown(job)
+                        linkedin_notes_written += 1
+                        print(f"    Wrote Obsidian note: {note_path.name}")
+                    if is_itviec and job.get("itviec_detail"):
+                        note_path = write_itviec_job_markdown(job)
+                        itviec_notes_written += 1
+                        print(f"    Wrote Obsidian note: {note_path.name}")
+                except (OSError, ValueError) as error:
+                    print(f"    Failed to write Obsidian note: {error}")
+                    failed += 1
+                    email_failed = True
+                    continue
+
             page_id = create_notion_page(job, dry_run=dry_run, body_md=body_md)
             if page_id:
                 created += 1
@@ -1502,13 +1573,11 @@ def main():
                         print(f"    Failed to attach Notion link to ITviec Obsidian note: {error}")
                         failed += 1
                         email_failed = True
-                if url:
-                    existing_urls.add(normalized_job_url(url))
-                if fingerprint:
-                    existing_fingerprints.add(fingerprint)
+                remember_job_identity(job, existing_urls, existing_fingerprints)
             elif dry_run:
                 created += 1  # count dry-run as success
                 created_jobs.append(job.copy())
+                remember_job_identity(job, existing_urls, existing_fingerprints)
             else:
                 failed += 1
                 email_failed = True
