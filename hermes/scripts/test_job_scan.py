@@ -94,6 +94,33 @@ class ITviecParsingTests(unittest.TestCase):
 
         self.assertEqual(jobs[0]["url"], tracking_url)
 
+    def test_assigns_distinct_links_when_one_job_title_contains_another(self):
+        body = (
+            "Job 1: Middle/Senior DevOps Engineer (Python, Linux, English)\n"
+            "Employer: Recruitment Company\n"
+            "Salary: You'll love it\n"
+            "Job 2: Senior Devops Engineer\n"
+            "Employer: Example Consulting\n"
+            "Salary: You'll love it\n"
+        )
+        first_url = "https://links.itviec.com/ls/click?upn=first-example"
+        second_url = "https://links.itviec.com/ls/click?upn=second-example"
+        email_html = (
+            f'<a class="text-decoration-none" href="{first_url}">'
+            "<span class='job-title ifs-16'>"
+            "Middle/Senior DevOps Engineer (Python, Linux, English)"
+            "</span></a>"
+            f'<a class="text-decoration-none" href="{second_url}">'
+            "<span class='job-title ifs-16'>Senior Devops Engineer</span></a>"
+        )
+
+        with tempfile.NamedTemporaryFile("w", suffix=".eml") as email_file:
+            email_file.write(email_html)
+            email_file.flush()
+            jobs = job_scan.parse_itviec_alert(body, email_file.name)
+
+        self.assertEqual([job["url"] for job in jobs], [first_url, second_url])
+
     def test_extracts_url_from_base64_mime_html(self):
         tracking_url = "https://links.itviec.com/ls/click?upn=base64-example"
         email_html = (

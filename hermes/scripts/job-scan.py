@@ -883,14 +883,25 @@ def parse_itviec_alert(body: str, eml_path: str | None = None) -> list[dict]:
     # Now try to extract URLs from the raw HTML export
     if eml_path and os.path.exists(eml_path):
         html_urls = _extract_itviec_urls_from_eml(eml_path)
-        # Match URLs to jobs by checking if job title appears in anchor text
+        normalized_html_urls = [
+            (normalized_text(html_job["title"]), html_job["url"])
+            for html_job in html_urls
+        ]
         for job in jobs:
             role_clean = normalized_text(job["role"])
-            for html_job in html_urls:
-                html_title_clean = normalized_text(html_job["title"])
-                if role_clean in html_title_clean or html_title_clean in role_clean:
-                    job["url"] = html_job["url"]
-                    break
+            exact_url = next(
+                (url for title, url in normalized_html_urls if title == role_clean),
+                "",
+            )
+            fallback_url = next(
+                (
+                    url
+                    for title, url in normalized_html_urls
+                    if role_clean in title or title in role_clean
+                ),
+                "",
+            )
+            job["url"] = exact_url or fallback_url
 
     return jobs
 
