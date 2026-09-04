@@ -229,7 +229,6 @@ class ITviecParsingTests(unittest.TestCase):
             jobs = job_scan.parse_itviec_alert(body, email_file.name)
 
         self.assertEqual([job["url"] for job in jobs], [short_url, exact_url])
-
     def test_extracts_url_from_base64_mime_html(self):
         tracking_url = "https://links.itviec.com/ls/click?upn=base64-example"
         email_html = (
