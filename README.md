@@ -25,13 +25,14 @@ opencli/
   clis/itviec/                     ITviec adapter
   sites/itviec/                    Adapter memory and verification fixture
 tools/
-  install-runtime.sh               Link repository files into Hermes/OpenCLI
+  install-runtime.sh               Stow scripts and link/copy remaining runtime files
   verify.sh                        Offline checks and optional live smoke checks
 ```
 
 ## Prerequisites
 
 - `uv`
+- GNU Stow 2.3.1 or newer
 - `opencli` 1.8.6 or newer
 - `himalaya`
 - Node.js 22 or newer
@@ -42,15 +43,28 @@ The scanner intentionally keeps runtime state at `~/.hermes/state/` and reads se
 
 ## Install
 
+Install from the canonical checkout:
+
 ```bash
 cd /home/delus/Documents/tools/hermes-custom
-npm install
+npm ci
 bash tools/install-runtime.sh
 ```
 
-The installer normally creates symlinks from the active Hermes/OpenCLI paths to this repository. Cron entrypoints (`job-scan-status.sh` and `cron-failure-watch.py`) are copied instead because Hermes requires scheduled scripts to resolve inside `~/.hermes/scripts`. If a destination differs from the repository file, it is backed up under `~/.hermes/backups/hermes-custom/<timestamp>/` before replacement.
+GNU Stow manages exactly the repository's `hermes/scripts/` package into `~/.hermes/scripts/`. The installer uses an explicit source directory and target, `--no-folding`, and ignores `__pycache__` plus generated `.pyc`/`.pyo` bytecode. It runs Stow with isolated temporary `HOME` and working directories, so ambient `.stowrc` options such as `--adopt` or `--simulate` cannot alter installation behavior. It does not Stow `~/.hermes` itself, skills, cache/state paths, or OpenCLI files. Those non-script files retain their existing individual-link behavior.
+
+Two script-package exceptions are always regular copied files: `job-scan-status.sh` and `cron-failure-watch.py`. Hermes cron containment rejects symlink entrypoints because their resolved paths leave `~/.hermes/scripts/`. If a copied destination differs from the repository file, the installer backs it up under `~/.hermes/backups/hermes-custom/<timestamp>/` before replacement.
 
 The default target is `~/.hermes`, even when the current shell has a profile-specific `HERMES_HOME`. A different target must be explicit via `HERMES_CUSTOM_HERMES_HOME=/absolute/path`; this prevents accidental writes into another Hermes profile.
+
+A linked Git worktree is intentionally refused as the source, preventing runtime links from becoming dangling links when the worktree is removed. To test or invoke this installer from a worktree, explicitly select the durable canonical checkout:
+
+```bash
+HERMES_CUSTOM_SOURCE_ROOT=/home/delus/Documents/tools/hermes-custom \
+  bash tools/install-runtime.sh
+```
+
+The override applies to both the Stow package and the remaining individual links. The installer accepts the old `job-scan.py`, `test_job_scan.py`, and `job-crawler.mjs` symlink set as a one-time migration, including links left dangling by a removed worktree. Healthy Stow links are preserved on reruns, and removed legacy links are restored if Stow fails. Copied-entrypoint and other conflicts in `~/.hermes/scripts/` are refused before migration; the installer never uses `stow --adopt`.
 
 The existing Hermes cron job continues to invoke:
 
@@ -58,7 +72,7 @@ The existing Hermes cron job continues to invoke:
 ~/.hermes/scripts/job-scan-status.sh
 ```
 
-That path is installed as a regular file inside the Hermes scripts directory, so it passes cron's script-containment check. The repository remains canonical; rerun the installer after changing the wrapper. No cron configuration change is required.
+That path remains a regular file inside the Hermes scripts directory. The canonical checkout remains authoritative; rerun the installer after changing either copied cron entrypoint. No cron configuration change is required.
 
 ## Verify
 

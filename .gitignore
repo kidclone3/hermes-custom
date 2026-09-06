@@ -2,6 +2,7 @@
 .env.*
 !.env.example
 node_modules/
+.worktrees/
 ~/
 __pycache__/
 *.py[cod]
