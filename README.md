@@ -12,6 +12,7 @@ Versioned source for local Hermes and OpenCLI customizations. Runtime state, cre
 - Regression tests
 - Versioned LinkedIn/ITviec backfill and repair utilities formerly stored in the runtime cache
 - The job-tracker skill and its Notion job-tracking reference
+- The agent-observability and use-agentsview skills, plus the signal-model reference
 - Legacy Playwright crawler retained as a diagnostic fallback
 
 ## Layout
@@ -20,7 +21,7 @@ Versioned source for local Hermes and OpenCLI customizations. Runtime state, cre
 hermes/
   scripts/                         Runtime scanner, tests, cron wrappers/watchdog, crawler
     backfill/                      Versioned operational backfill/repair sources
-  skills/productivity/             Custom skill files used by Hermes
+  skills/                          Custom skill files grouped by category
 opencli/
   clis/itviec/                     ITviec adapter
   sites/itviec/                    Adapter memory and verification fixture
