@@ -276,6 +276,8 @@ for utility in \
 done
 link_file "$source_root/hermes/skills/productivity/job-tracker/SKILL.md" \
   "$hermes_home/skills/productivity/job-tracker/SKILL.md"
+link_file "$source_root/hermes/skills/autonomous-ai-agents/honcho-config-audit/SKILL.md" \
+  "$hermes_home/skills/autonomous-ai-agents/honcho-config-audit/SKILL.md"
 link_file "$source_root/hermes/skills/productivity/notion-operations/references/job-tracking-database.md" \
   "$hermes_home/skills/productivity/notion-operations/references/job-tracking-database.md"
 link_file "$source_root/hermes/skills/software-development/agent-observability/SKILL.md" \
