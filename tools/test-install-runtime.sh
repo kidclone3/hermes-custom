@@ -188,6 +188,8 @@ assert_link_target "$hermes_home/skills/software-development/agent-observability
   "$canonical_source/hermes/skills/software-development/agent-observability/references/signal-model.md"
 assert_link_target "$hermes_home/skills/software-development/use-agentsview/SKILL.md" \
   "$canonical_source/hermes/skills/software-development/use-agentsview/SKILL.md"
+assert_link_target "$hermes_home/skills/autonomous-ai-agents/honcho-config-audit/SKILL.md" \
+  "$canonical_source/hermes/skills/autonomous-ai-agents/honcho-config-audit/SKILL.md"
 assert_link_target "$opencli_home/clis/itviec/job-public-detail.js" \
   "$canonical_source/opencli/clis/itviec/job-public-detail.js"
 OPENCLI_HOME="$opencli_home" opencli validate itviec/job-public-detail >/dev/null
