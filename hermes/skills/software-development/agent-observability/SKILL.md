@@ -8,7 +8,7 @@ platforms: [linux, macos, windows]
 metadata:
   hermes:
     tags: [agents, observability, anomalies, tracing, debugging]
-    related_skills: [use-agentsview, use-phoenix, agent-runtime-observability, llm-observability, systematic-debugging, event-driven-gateway-debugging]
+    related_skills: [use-agentsview, use-phoenix, agent-runtime-observability, systematic-debugging]
 ---
 
 # Agent Observability
@@ -19,7 +19,7 @@ Investigate LLM-agent reliability and performance using correlated evidence rath
 
 Use for stalled turns, slow agents, failed tools, retry loops, context growth, unexpected cost, incomplete tasks, gateway interruptions, or unexplained differences between wall time and active work.
 
-Do not use this skill alone to implement telemetry exporters or modify observability infrastructure. Load `llm-observability` for instrumentation changes and `systematic-debugging` before applying a fix.
+Do not use this skill alone to implement telemetry exporters or modify observability infrastructure. For Hermes OTel instrumentation, load `hermes_otel:observability` when installed; otherwise inspect the runtime and report the missing adapter. Load `systematic-debugging` before applying a fix when available.
 
 ## Core Model
 
@@ -43,7 +43,9 @@ Load backend skills explicitly with `skill_view`; `related_skills` metadata does
 - Provider/API spans, TTFB, retries, model latency, OTLP export, or trace hierarchy: load `use-phoenix`.
 - Cross-layer or unclear incidents: load both and correlate by stable IDs and timestamps.
 - Runtime supervision, PTY/ACP architecture, status authority, dashboards, or session restoration: load `agent-runtime-observability`.
-- Gateway, attachment, interrupt, or delivery paths: also load `event-driven-gateway-debugging`.
+- Gateway, attachment, interrupt, or delivery paths: inspect the relevant Hermes runtime source and logs; do not assume an archived gateway skill is installed.
+
+`agent-runtime-observability` and `systematic-debugging` are optional companion skills supplied outside this repository. If absent, continue read-only evidence collection with the available adapters and report the missing specialization; do not claim to have followed it.
 
 If the required MCP server is unavailable, report the missing evidence source. Do not silently replace MCP evidence with guesses.
 

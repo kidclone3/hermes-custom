@@ -12,7 +12,7 @@ Versioned source for local Hermes and OpenCLI customizations. Runtime state, cre
 - Regression tests
 - Versioned LinkedIn/ITviec backfill and repair utilities formerly stored in the runtime cache
 - The job-tracker skill and its Notion job-tracking reference
-- The agent-observability and use-agentsview skills, plus the signal-model reference
+- The agent-observability, use-agentsview, and use-phoenix skills, plus the signal-model reference
 - Legacy Playwright crawler retained as a diagnostic fallback
 
 ## Layout
