@@ -288,6 +288,10 @@ link_file "$source_root/hermes/skills/software-development/use-agentsview/SKILL.
   "$hermes_home/skills/software-development/use-agentsview/SKILL.md"
 link_file "$source_root/hermes/skills/mlops/use-phoenix/SKILL.md" \
   "$hermes_home/skills/mlops/use-phoenix/SKILL.md"
+link_file "$source_root/hermes/skills/mlops/llm-observability/SKILL.md" \
+  "$hermes_home/skills/mlops/llm-observability/SKILL.md"
+link_file "$source_root/hermes/skills/software-development/event-driven-gateway-debugging/SKILL.md" \
+  "$hermes_home/skills/software-development/event-driven-gateway-debugging/SKILL.md"
 link_file "$source_root/opencli/clis/itviec/job-public-detail.js" \
   "$opencli_home/clis/itviec/job-public-detail.js"
 link_file "$source_root/opencli/sites/itviec/endpoints.json" \

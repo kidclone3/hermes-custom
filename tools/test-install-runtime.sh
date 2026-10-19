@@ -192,6 +192,10 @@ assert_link_target "$hermes_home/skills/autonomous-ai-agents/honcho-config-audit
   "$canonical_source/hermes/skills/autonomous-ai-agents/honcho-config-audit/SKILL.md"
 assert_link_target "$hermes_home/skills/mlops/use-phoenix/SKILL.md" \
   "$canonical_source/hermes/skills/mlops/use-phoenix/SKILL.md"
+assert_link_target "$hermes_home/skills/mlops/llm-observability/SKILL.md" \
+  "$canonical_source/hermes/skills/mlops/llm-observability/SKILL.md"
+assert_link_target "$hermes_home/skills/software-development/event-driven-gateway-debugging/SKILL.md" \
+  "$canonical_source/hermes/skills/software-development/event-driven-gateway-debugging/SKILL.md"
 assert_link_target "$opencli_home/clis/itviec/job-public-detail.js" \
   "$canonical_source/opencli/clis/itviec/job-public-detail.js"
 OPENCLI_HOME="$opencli_home" opencli validate itviec/job-public-detail >/dev/null
