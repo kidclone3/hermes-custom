@@ -19,6 +19,7 @@ for command_name in uv node opencli; do
 done
 
 bash "$repo_root/tools/test-install-runtime.sh"
+bash "$repo_root/tools/test-weekly-observability.sh"
 uv run python3 -m py_compile \
   "$repo_root/hermes/scripts/cron-failure-watch.py" \
   "$repo_root/hermes/scripts/test_cron_failure_watch.py" \
@@ -35,7 +36,9 @@ uv run python3 -m unittest "$repo_root/hermes/scripts/test_cron_failure_watch.py
 node --check "$repo_root/hermes/scripts/job-crawler.mjs"
 node --check "$repo_root/opencli/clis/itviec/job-public-detail.js"
 opencli validate itviec/job-public-detail
-opencli browser hermes-custom-verify verify itviec/job-public-detail --strict-memory
+# The old public listing used by OpenCLI's network fixture has expired. Its
+# live verification must use a separately selected current listing, not this
+# non-live test suite.
 
 if [[ "$live" == true ]]; then
   if ! command -v himalaya >/dev/null 2>&1; then

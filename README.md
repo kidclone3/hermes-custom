@@ -54,7 +54,9 @@ bash tools/install-runtime.sh
 
 GNU Stow manages exactly the repository's `hermes/scripts/` package into `~/.hermes/scripts/`. The installer uses an explicit source directory and target, `--no-folding`, and ignores `__pycache__` plus generated `.pyc`/`.pyo` bytecode. It runs Stow with isolated temporary `HOME` and working directories, so ambient `.stowrc` options such as `--adopt` or `--simulate` cannot alter installation behavior. It does not Stow `~/.hermes` itself, skills, cache/state paths, or OpenCLI files. Those non-script files retain their existing individual-link behavior.
 
-Two script-package exceptions are always regular copied files: `job-scan-status.sh` and `cron-failure-watch.py`. Hermes cron containment rejects symlink entrypoints because their resolved paths leave `~/.hermes/scripts/`. If a copied destination differs from the repository file, the installer backs it up under `~/.hermes/backups/hermes-custom/<timestamp>/` before replacement.
+Two existing script-package exceptions, `job-scan-status.sh` and `cron-failure-watch.py`, plus the weekly observability preflight `agentsview-preflight.sh`, are always regular copied files. Hermes cron containment rejects symlink entrypoints because their resolved paths leave `~/.hermes/scripts/`. If a copied destination differs from the repository file, the installer backs it up under `~/.hermes/backups/hermes-custom/<timestamp>/` before replacement.
+
+The weekly observability job's sanitized definition, prerequisites, and recreation procedure are in [`hermes/cron/README.md`](hermes/cron/README.md). Installation does not create or update cron jobs automatically; check for the existing job before recreating it.
 
 The default target is `~/.hermes`, even when the current shell has a profile-specific `HERMES_HOME`. A different target must be explicit via `HERMES_CUSTOM_HERMES_HOME=/absolute/path`; this prevents accidental writes into another Hermes profile.
 
@@ -90,13 +92,7 @@ set -a && . ~/.hermes/.env && set +a
 npm run verify:live
 ```
 
-The OpenCLI adapter can also be exercised directly:
-
-```bash
-opencli itviec job-public-detail \
-  "https://itviec.com/it-jobs/fresher-junior-senior-ai-agent-engineer-grit-logic-reap-ai-0022" \
-  -f json
-```
+The OpenCLI adapter's former live example listing expired (ITviec returns HTTP 410). The deterministic suite still validates the adapter; use a current real listing for a separate live smoke test instead of committing an expiring URL as a required fixture.
 
 ## Runtime data deliberately excluded
 

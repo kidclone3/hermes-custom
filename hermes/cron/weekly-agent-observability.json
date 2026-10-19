@@ -1,0 +1,28 @@
+{
+  "name": "Weekly Agent Observability Scan",
+  "prompt": "Run a read-only weekly reliability scan of local LLM-agent activity for the immediately preceding seven days.\n\nAgentsView preflight is mandatory. A deterministic pre-run script checks the local AgentsView API before this agent is constructed and runs `agentsview serve --background --no-browser` when no AgentsView process or API is available. Read its injected output first. Do not trust `agentsview serve status` alone because v0.42.0 has returned false negatives while port 8081 was serving; treat HTTP 200 or authentication-required HTTP 401 from `/api/v1/version` on localhost:8081 or localhost:8080 as reachable. If the preflight failed, inspect process/listener state, make at most one non-destructive `agentsview serve --background --no-browser` attempt when no AgentsView process exists, and verify API reachability. Then discover the AgentsView MCP schemas. If the MCP tools still are not visible after the service is reachable, explicitly report the adapter/catalog gap and use labelled read-only CLI/database fallback evidence.\n\nUse Asia/Ho_Chi_Minh for every timestamp and state an exact inclusive start/end window. Cover Hermes Agent across the default profile and active profiles, plus OMP, Codex, Pi, gateways, model requests, tool calls, runtime boundaries, AgentsView, and Phoenix when evidence exists.\n\nFollow the loaded agent-observability procedure and signal model. Route session/lifecycle/tool evidence through the configured AgentsView MCP and provider/span evidence through the configured Phoenix MCP. Discover schemas before invoking tools. If an MCP adapter is unavailable, explicitly record that evidence gap; a read-only CLI or local database fallback may supplement the investigation only when labelled by its actual source, never as MCP evidence.\n\nStart with aggregate metadata, then inspect exact outlier sessions. Preserve stable session/trace/span/tool-use IDs and timestamps, but do not include prompts, responses, tool arguments, sender identifiers, credentials, or other sensitive payloads in the delivered report. Verify all declared totals programmatically and account for pagination.\n\nCompare the seven-day cohort against the previous weekly report when available through continuity; otherwise use comparable successful sessions in the same window. Separate wall time, active work, model/provider latency, tools, human waits, exporter delay, and inactive lifecycle time. Do not infer TTFB from total duration or treat health grades as root causes.\n\nCheck at minimum: failed or abandoned sessions, stale/open lifecycle records, latency outliers, retry amplification, repeated waits and loops, tool-failure streaks, missing completion events, context/token-field inconsistencies, observer/exporter failures, MCP/tool-catalog visibility, gateway restarts and delivery anomalies, browser-extension route errors, and current process/resource anomalies. Inspect Hermes logs only within the bounded window and state when log rotation limits coverage.\n\nRun one safe, read-only discriminating probe for the leading live anomaly. Do not stop services, change configuration, edit files, or remediate anything. Confirm observer failures remain fail-open by identifying successful primary operations during any observer outage when possible.\n\nReturn a concise report with exactly these sections: Incident; Window/timezone; Scope; Baseline; Observed facts; Abnormal signals ranked by impact and confidence; Timeline; 3-5 falsifiable hypotheses with evidence for and against; Evidence gaps; Executed probe and result; Recommended next action. If nothing material is abnormal, say so directly and still report coverage and evidence gaps.",
+  "skills": [
+    "software-development/agent-observability",
+    "software-development/use-agentsview",
+    "mlops/use-phoenix",
+    "software-development/agent-runtime-observability",
+    "software-development/event-driven-gateway-debugging",
+    "autonomous-ai-agents/hermes-agent"
+  ],
+  "script": "agentsview-preflight.sh",
+  "no_agent": false,
+  "enabled_toolsets": [
+    "terminal",
+    "file",
+    "code_execution",
+    "skills",
+    "session_search",
+    "agentsview",
+    "phoenix"
+  ],
+  "attach_to_session": true,
+  "schedule": "every sunday 9am",
+  "continuity": true,
+  "workdir_hint": "Hermes home of the target profile; set its absolute path at creation",
+  "delivery_hint": "Choose the intended destination explicitly at creation; never import the source chat ID."
+}

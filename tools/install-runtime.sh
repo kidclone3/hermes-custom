@@ -227,6 +227,7 @@ stow_args=(
 cron_entrypoints=(
   job-scan-status.sh
   cron-failure-watch.py
+  agentsview-preflight.sh
 )
 for cron_entrypoint in "${cron_entrypoints[@]}"; do
   cron_source="$source_root/hermes/scripts/$cron_entrypoint"
@@ -264,6 +265,8 @@ copy_file "$source_root/hermes/scripts/job-scan-status.sh" \
   "$hermes_home/scripts/job-scan-status.sh"
 copy_file "$source_root/hermes/scripts/cron-failure-watch.py" \
   "$hermes_home/scripts/cron-failure-watch.py"
+copy_file "$source_root/hermes/scripts/agentsview-preflight.sh" \
+  "$hermes_home/scripts/agentsview-preflight.sh"
 for utility in \
   repair_flat_linkedin_notion.py \
   query_linkedin_jobs.py \
@@ -288,14 +291,16 @@ link_file "$source_root/hermes/skills/software-development/use-agentsview/SKILL.
   "$hermes_home/skills/software-development/use-agentsview/SKILL.md"
 link_file "$source_root/hermes/skills/mlops/use-phoenix/SKILL.md" \
   "$hermes_home/skills/mlops/use-phoenix/SKILL.md"
+link_file "$source_root/hermes/skills/mlops/llm-observability/SKILL.md" \
+  "$hermes_home/skills/mlops/llm-observability/SKILL.md"
+link_file "$source_root/hermes/skills/software-development/event-driven-gateway-debugging/SKILL.md" \
+  "$hermes_home/skills/software-development/event-driven-gateway-debugging/SKILL.md"
 link_file "$source_root/opencli/clis/itviec/job-public-detail.js" \
   "$opencli_home/clis/itviec/job-public-detail.js"
 link_file "$source_root/opencli/sites/itviec/endpoints.json" \
   "$opencli_home/sites/itviec/endpoints.json"
 link_file "$source_root/opencli/sites/itviec/notes.md" \
   "$opencli_home/sites/itviec/notes.md"
-link_file "$source_root/opencli/sites/itviec/verify/job-public-detail.json" \
-  "$opencli_home/sites/itviec/verify/job-public-detail.json"
 
 printf '\nInstalled hermes-custom: scripts managed by GNU Stow; %s additional link(s), %s copy/copies, %s backup(s).\n' \
   "$link_count" "$copy_count" "$backup_count"
