@@ -19,6 +19,7 @@ for command_name in uv node opencli; do
 done
 
 bash "$repo_root/tools/test-install-runtime.sh"
+bash "$repo_root/tools/test-weekly-observability.sh"
 uv run python3 -m py_compile \
   "$repo_root/hermes/scripts/cron-failure-watch.py" \
   "$repo_root/hermes/scripts/test_cron_failure_watch.py" \

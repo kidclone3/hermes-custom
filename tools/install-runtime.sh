@@ -227,6 +227,7 @@ stow_args=(
 cron_entrypoints=(
   job-scan-status.sh
   cron-failure-watch.py
+  agentsview-preflight.sh
 )
 for cron_entrypoint in "${cron_entrypoints[@]}"; do
   cron_source="$source_root/hermes/scripts/$cron_entrypoint"
@@ -264,6 +265,8 @@ copy_file "$source_root/hermes/scripts/job-scan-status.sh" \
   "$hermes_home/scripts/job-scan-status.sh"
 copy_file "$source_root/hermes/scripts/cron-failure-watch.py" \
   "$hermes_home/scripts/cron-failure-watch.py"
+copy_file "$source_root/hermes/scripts/agentsview-preflight.sh" \
+  "$hermes_home/scripts/agentsview-preflight.sh"
 for utility in \
   repair_flat_linkedin_notion.py \
   query_linkedin_jobs.py \
