@@ -92,13 +92,7 @@ set -a && . ~/.hermes/.env && set +a
 npm run verify:live
 ```
 
-The OpenCLI adapter can also be exercised directly:
-
-```bash
-opencli itviec job-public-detail \
-  "https://itviec.com/it-jobs/fresher-junior-senior-ai-agent-engineer-grit-logic-reap-ai-0022" \
-  -f json
-```
+The OpenCLI adapter's former live example listing expired (ITviec returns HTTP 410). The deterministic suite still validates the adapter; use a current real listing for a separate live smoke test instead of committing an expiring URL as a required fixture.
 
 ## Runtime data deliberately excluded
 

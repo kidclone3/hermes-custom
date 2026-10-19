@@ -301,8 +301,6 @@ link_file "$source_root/opencli/sites/itviec/endpoints.json" \
   "$opencli_home/sites/itviec/endpoints.json"
 link_file "$source_root/opencli/sites/itviec/notes.md" \
   "$opencli_home/sites/itviec/notes.md"
-link_file "$source_root/opencli/sites/itviec/verify/job-public-detail.json" \
-  "$opencli_home/sites/itviec/verify/job-public-detail.json"
 
 printf '\nInstalled hermes-custom: scripts managed by GNU Stow; %s additional link(s), %s copy/copies, %s backup(s).\n' \
   "$link_count" "$copy_count" "$backup_count"
